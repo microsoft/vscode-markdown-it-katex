@@ -146,4 +146,12 @@ $$
 .
 <p class="katex-block katex-error" title="\f
 ">ParseError: KaTeX parse error: Undefined control sequence: \f at position 1: \̲f̲
-</p>.
+</p>
+.
+
+Delimiter in markdown block
+.
+<code>$x</code> `${a}`
+.
+<p>&lt;code&gt;$x&lt;/code&gt; <code>${a}</code></p>
+.
