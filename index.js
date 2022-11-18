@@ -28,19 +28,47 @@ function isValidInlineDelim(state, pos) {
 
     let canOpen = false;
     let canClose = false;
-    if (prevChar !== '$' && prevChar !== '\\' && (
+    if (prevChar !== '$' && prevChar !== '\\' && !isDanglingInBlock(state, pos).is_last && (
         prevChar === undefined || isWhitespace(prevChar) || !isWordCharacterOrNumber(prevChar)
     )) {
         canOpen = true;
     }
 
-    if (nextChar !== '$' && (
+    if (nextChar !== '$' && !isDanglingInBlock(state, pos).is_first && (
         nextChar == undefined || isWhitespace(nextChar) || !isWordCharacterOrNumber(nextChar))
     ) {
         canClose = true;
     }
 
     return { can_open: canOpen, can_close: canClose };
+}
+
+/**
+ * Given state.src[pos] === '$',
+ * test if it is the first/last dollar symbol in a markdown block
+ * 
+ * @returns {{ is_first: boolean, is_last: boolean }}
+ */
+function isDanglingInBlock(state, pos) {
+    const before = state.src.slice(0, pos);
+    const after = state.src.slice(pos + 1);
+    const tokens = ['`', '\\*', '\\*\\*', '_', '__'];
+
+    let isFirst = false;
+    let isLast = false;
+
+    for (const token of tokens) {
+        if ((before.match(new RegExp(token, 'g')) || []).length % 2 == 1) { // is inside block
+            if (!(new RegExp('\\$(?!.*' + token + ')')).test(before)) { // is the first $ inside block
+                isFirst = true;
+            }
+            if (!(new RegExp('\\$(?=[^\\$]*' + token + ')')).test(after)) { // is the last $ inside (closed) block
+                isLast = true;
+            }
+        }
+    }
+
+    return { is_first: isFirst, is_last: isLast };
 }
 
 /**
