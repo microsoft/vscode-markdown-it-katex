@@ -1,27 +1,44 @@
-var path = require('path'),
-	tape = require('tape'),
-	testLoad = require('markdown-it-testgen').load,
-	mdk = require('../index');
+const path = require('path');
+const tape = require('tape');
+const testLoad = require('markdown-it-testgen').load;
+const mdk = require('../index');
+const mdIt = require('markdown-it');
 
-var md = require('markdown-it')()
-	.use(mdk);
+function runTest(fixturePath, md) {
+	testLoad(fixturePath, (data) => {
+		data.fixtures.forEach((fixture) => {
 
-/* this uses the markdown-it-testgen module to automatically generate tests
-   based on an easy to read text file
- */
-testLoad(path.join(__dirname, 'fixtures/default.txt'), function(data){
-	data.fixtures.forEach(function (fixture){
+			/* generic test definition code using tape */
+			tape(fixture.header, (t) => {
+				t.plan(1);
 
-		/* generic test definition code using tape */
-		tape(fixture.header, function(t){
-			t.plan(1);
+				// Replace nbps with actual space
+				const expected = normalizeWithStub(fixture.second.text).normalize().replaceAll('\u00A0', ' ');
+				const actual = normalizeWithStub(md.render(fixture.first.text)).normalize().replaceAll('\u00A0', ' ');
 
-			var expected = fixture.second.text,
-				actual = md.render(fixture.first.text);
-
-			t.equals(actual, expected);
-
+				t.equals(actual, expected);
+			});
 		});
-
 	});
-});
+}
+
+// Replace differences between OS (Linux vs Windows) with stubs as we are not testing those specific
+// values for these tests.
+function normalizeWithStub(text) {
+	// ex: style="height:1.6667em;..." => style=""
+	text = text.replaceAll(/style=\".*?\"/g, "style=\"\"");
+
+	// ex: rowspacing="0.1600em" => rowspacing="1.0em"
+	text = text.replaceAll(/=\"\d+\.?\d*em\"/g, "=\"1.0em\"");
+
+	// ex: <svg...></svg> => <svg></svg>
+	text = text.replaceAll(/<svg[\s\S]*?><\/svg>/gm, "<svg></svg>");
+	return text;
+}
+
+
+runTest(path.join(__dirname, 'fixtures', 'default.txt'), mdIt({ html: true }).use(mdk,));
+
+runTest(path.join(__dirname, 'fixtures', 'bare.txt'), mdIt().use(mdk, { enableBareBlocks: true }));
+
+runTest(path.join(__dirname, 'fixtures', 'math-in-html.txt'), mdIt({ html: true }).use(mdk, { enableMathBlockInHtml: true, enableMathInlineInHtml: true }));

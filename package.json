@@ -1,11 +1,12 @@
 {
     "name": "@iktakahiro/markdown-it-katex",
-    "version": "4.0.1",
+    "version": "4.0.4",
     "description": "Fast math support for markdown-it with KaTeX",
     "main": "index.js",
     "scripts": {
         "watch": "watchify browser.js -o bundle.js -v",
-        "test": "node test/all.js"
+        "test": "node test/all.js",
+        "test-render": "node test/test-render.js test/test.md > test/out.html"
     },
     "repository": {
         "type": "git",
@@ -22,11 +23,12 @@
     "author": "Takahiro Ethan Ikeuchi @iktakahiro",
     "license": "MIT",
     "dependencies": {
-        "katex": "^0.16.4"
+        "katex": "^0.16.2"
     },
     "devDependencies": {
-        "markdown-it": "^13.0.1",
+        "@types/markdown-it": "^12.2.3",
+        "markdown-it": "11.0.0",
         "markdown-it-testgen": "0.1.6",
-        "tape": "^5.6.1"
+        "tape": "5.0.1"
     }
 }

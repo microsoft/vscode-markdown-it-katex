@@ -1,0 +1,124 @@
+Math block in html
+.
+start
+
+<ol>
+    <li>$$x$$</li>
+</ol>
+
+end
+.
+<p>start</p>
+<ol>
+    <li><p class="katex-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal">x</span></span></span></span></span></p>
+</li>
+</ol>
+<p>end</p>
+.
+
+Math inline in html
+.
+start
+
+<ol>
+    <li>$x$</li>
+</ol>
+
+end
+.
+<p>start</p>
+<ol>
+    <li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal">x</span></span></span></span></li>
+</ol>
+<p>end</p>
+.
+
+Math inline and math block in same html
+.
+start
+
+<ol>
+    <li>$x$</li>
+    <li>$$y$$</li>
+</ol>
+
+end
+.
+<p>start</p>
+<ol>
+    <li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal">x</span></span></span></span></li>
+    <li><p class="katex-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal" style="">y</span></span></span></span></span></p>
+</li>
+</ol>
+<p>end</p>
+.
+
+Two math block in same html
+.
+start
+
+<ol>
+    <li>$$x$$</li>
+    <li>$$y$$</li>
+</ol>
+
+end
+.
+<p>start</p>
+<ol>
+    <li><p class="katex-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal">x</span></span></span></span></span></p>
+</li>
+    <li><p class="katex-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal" style="">y</span></span></span></span></span></p>
+</li>
+</ol>
+<p>end</p>
+.
+
+Two math inline in same html
+.
+start
+
+<ol>
+    <li>$x$</li>
+    <li>$y$</li>
+</ol>
+
+end
+.
+<p>start</p>
+<ol>
+    <li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal">x</span></span></span></span></li>
+    <li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal" style="">y</span></span></span></span></li>
+</ol>
+<p>end</p>
+.
+
+Two math block in two different html
+.
+<ol>
+    <li>$$x$$</li>
+</ol>
+
+middle
+
+<ol>
+    <li>$$y$$</li>
+</ol>
+.
+<ol>
+    <li><p class="katex-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal">x</span></span></span></span></span></p>
+</li>
+</ol>
+<p>middle</p>
+<ol>
+    <li><p class="katex-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal" style="">y</span></span></span></span></span></p>
+</li>
+</ol>
+.
+
+Should not parse opening $ inside of inline html
+.
+<code>$x</code> `${a}`
+.
+<p><code>$x</code> <code>${a}</code></p>
+.
