@@ -1,5 +1,5 @@
 {
-    "name": "@iktakahiro/markdown-it-katex",
+    "name": "@aquabx/markdown-it-katex",
     "version": "4.0.5",
     "description": "Fast math support for markdown-it with KaTeX",
     "main": "index.js",
@@ -10,7 +10,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com:iktakahiro/markdown-it-katex.git"
+        "url": "https://www.github.com/aquabx/markdown-it-katex"
     },
     "keywords": [
         "markdown",
@@ -20,7 +20,7 @@
         "markdown-it-plugin",
         "markdown-it"
     ],
-    "author": "Takahiro Ethan Ikeuchi @iktakahiro",
+    "author": "Tom Chauvel @AquaBx",
     "license": "MIT",
     "dependencies": {
         "katex": "^0.16.2"
