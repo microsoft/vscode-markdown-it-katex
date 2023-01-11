@@ -21,7 +21,7 @@ npm install markdown-it
 Install the plugin
 
 ```bash
-npm install @iktakahiro/markdown-it-katex
+npm install @aquabx/markdown-it-katex
 ```
 
 Use it in your javascript
