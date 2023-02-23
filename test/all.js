@@ -1,7 +1,7 @@
 const path = require('path');
 const tape = require('tape');
 const testLoad = require('markdown-it-testgen').load;
-const mdk = require('../dist/index');
+const mdk = require('../dist/index').default;
 const mdIt = require('markdown-it');
 
 /**
