@@ -1,14 +1,18 @@
 const path = require('path');
 const tape = require('tape');
 const testLoad = require('markdown-it-testgen').load;
-const mdk = require('../index');
+const mdk = require('../dist/index').default;
 const mdIt = require('markdown-it');
 
+/**
+ * @param {string} fixturePath
+ * @param {mdIt} md
+ */
 function runTest(fixturePath, md) {
-	testLoad(fixturePath, (data) => {
+	testLoad(fixturePath, (/** @type {{ fixtures: any[]; }} */ data) => {
 		data.fixtures.forEach((fixture) => {
 
-			/* generic test definition code using tape */
+			// generic test definition code using tape
 			tape(fixture.header, (t) => {
 				t.plan(1);
 
@@ -22,8 +26,12 @@ function runTest(fixturePath, md) {
 	});
 }
 
-// Replace differences between OS (Linux vs Windows) with stubs as we are not testing those specific
-// values for these tests.
+/**
+ * Replace differences between OS (Linux vs Windows) with stubs as we are not testing those specific 
+ * values for these tests.
+ * 
+ * @param {string} text
+ */
 function normalizeWithStub(text) {
 	// ex: style="height:1.6667em;..." => style=""
 	text = text.replaceAll(/style=\".*?\"/g, "style=\"\"");

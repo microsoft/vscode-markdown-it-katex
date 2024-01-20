@@ -1,5 +1,5 @@
 var md = require('markdown-it')(),
-	mk = require('./index');
+	mk = require('./src/index');
 
 md.use(mk);
 

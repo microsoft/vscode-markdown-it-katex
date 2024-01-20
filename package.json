@@ -2,9 +2,15 @@
     "name": "@aquabx/markdown-it-katex",
     "version": "4.0.5",
     "description": "Fast math support for markdown-it with KaTeX",
-    "main": "index.js",
+    "main": "dist/index.js",
+    "types": "types.d.ts",
+    "files": [
+        "dist/index.js",
+        "types.d.ts"
+    ],
     "scripts": {
-        "watch": "watchify browser.js -o bundle.js -v",
+        "compile": "tsc -p .",
+        "watch": "tsc -p . -watch",
         "test": "node test/all.js",
         "test-render": "node test/test-render.js test/test.md > test/out.html"
     },
@@ -23,12 +29,14 @@
     "author": "Tom Chauvel @AquaBx",
     "license": "MIT",
     "dependencies": {
-        "katex": "^0.16.2"
+        "katex": "^0.16.4"
     },
     "devDependencies": {
+        "@types/katex": "^0.16.0",
         "@types/markdown-it": "^12.2.3",
-        "markdown-it": "^13.0.1",
-        "markdown-it-testgen": "0.1.6",
-        "tape": "^5.6.1"
+        "markdown-it": "^14.0.0",
+        "markdown-it-testgen": "^0.1.6",
+        "tape": "^5.6.1",
+        "typescript": "^5.3.0"
     }
 }
