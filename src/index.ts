@@ -3,6 +3,7 @@ import type * as StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type StateCore from 'markdown-it/lib/rules_core/state_core';
 import type * as StateInline from 'markdown-it/lib/rules_inline/state_inline';
 import type * as Token from 'markdown-it/lib/token';
+import { MarkdownKatexOptions } from '../types';
 
 /**
  * Test if potential opening or closing delimiter
@@ -206,18 +207,17 @@ function blockMath(state: StateBlock, start: number, end: number, silent: boolea
 }
 
 function blockBareMath(state: StateBlock, start: number, end: number, silent: boolean): boolean {
-    var lastLine, found = false,
-        pos = state.bMarks[start] + state.tShift[start],
-        max = state.eMarks[start]
+    const startPos = state.bMarks[start] + state.tShift[start];
+    const startMax = state.eMarks[start];
+    const firstLine = state.src.slice(startPos, startMax);
 
-    const firstLine = state.src.slice(pos, max);
-
-    if (!/^\\begin/.test(firstLine)) {
+    const beginMatch = firstLine.match(/^\s*\\begin\s*\{([^{}]+)\}/);
+    if (!beginMatch) {
         return false;
     }
 
     if (start > 0) {
-        // Previous line must be blank for bare blocks
+        // Previous line must be blank for bare blocks. There are instead handled by inlineBareBlock
         const previousStart = state.bMarks[start - 1] + state.tShift[start - 1];
         const previousEnd = state.eMarks[start - 1];
         const previousLine = state.src.slice(previousStart, previousEnd);
@@ -230,33 +230,33 @@ function blockBareMath(state: StateBlock, start: number, end: number, silent: bo
         return true;
     }
 
-    // Handle Single line code block
-    let next = start
-    if (!/\\end[\{\}\w]*\s*$/.test(firstLine)) {
+    const beginEndStack: string[] = [];
+    let next = start;
+    let lastLine: string | undefined;
+    let found = false;
+    outer: for (; !found; next++) {
+        if (next >= end) {
+            break;
+        }
 
-        let nestingCount = 0;
-        for (; !found;) {
-            next++;
-            if (next >= end) {
-                break;
-            }
+        const pos = state.bMarks[next] + state.tShift[next];
+        const max = state.eMarks[next];
 
-            pos = state.bMarks[next] + state.tShift[next];
-            max = state.eMarks[next];
+        if (pos < max && state.tShift[next] < state.blkIndent) {
+            // non-empty line with negative indent should stop the list:
+            break;
+        }
 
-            if (pos < max && state.tShift[next] < state.blkIndent) {
-                // non-empty line with negative indent should stop the list:
-                break;
-            }
-            const line = state.src.slice(pos, max);
-            if (/\\begin/.test(line)) {
-                ++nestingCount;
-            } else if (/\\end/.test(line)) {
-                --nestingCount;
-                if (nestingCount < 0) {
-                    const lastPos = max;
-                    lastLine = state.src.slice(pos, lastPos);
+        const line = state.src.slice(pos, max);
+        for (const match of line.matchAll(/(\\begin|\\end)\s*\{([^{}]+)\}/g)) {
+            if (match[1] === '\\begin') {
+                beginEndStack.push(match[2].trim());
+            } else if (match[1] === '\\end') {
+                beginEndStack.pop();
+                if (!beginEndStack.length) {
+                    lastLine = state.src.slice(pos, max);
                     found = true;
+                    break outer;
                 }
             }
         }
@@ -266,9 +266,7 @@ function blockBareMath(state: StateBlock, start: number, end: number, silent: bo
 
     const token = state.push('math_block', 'math', 0);
     token.block = true;
-    token.content = (firstLine && firstLine.trim() ? firstLine + '\n' : '')
-        + state.getLines(start + 1, next, state.tShift[start], true)
-        + (lastLine && lastLine.trim() ? lastLine : '');
+    token.content = (state.getLines(start, next, state.tShift[start], true) + (lastLine ?? '')).trim()
     token.map = [start, state.line];
     token.markup = '$$';
     return true;
@@ -352,6 +350,8 @@ function inlineMathBlock(state: StateInline, silent: boolean): boolean {
 
 function inlineBareBlock(state: StateInline, silent: boolean): boolean {
     const text = state.src.slice(state.pos);
+
+    // Make sure this is not a normal bare block
     if (!/^\n\\begin/.test(text)) {
         return false;
     }
@@ -362,20 +362,20 @@ function inlineBareBlock(state: StateInline, silent: boolean): boolean {
     }
 
     const lines = text.split(/\n/g).slice(1);
-    const beginRe = /^\\begin/;
-    const endRe = /^\\end/;
 
-    let nestingCount = 0;
-    let foundLine: number | undefined = undefined;
-    for (var i = 0; i < lines.length; ++i) {
+    let foundLine: number | undefined;
+    const beginEndStack: string[] = [];
+    outer: for (var i = 0; i < lines.length; ++i) {
         const line = lines[i];
-        if (beginRe.test(line)) {
-            ++nestingCount;
-        } else if (endRe.test(line)) {
-            --nestingCount;
-            if (nestingCount <= 0) {
-                foundLine = i;
-                break;
+        for (const match of line.matchAll(/(\\begin|\\end)\s*\{([^{}]+)\}/g)) {
+            if (match[1] === '\\begin') {
+                beginEndStack.push(match[2].trim());
+            } else if (match[1] === '\\end') {
+                beginEndStack.pop();
+                if (!beginEndStack.length) {
+                    foundLine = i;
+                    break outer;
+                }
             }
         }
     }
@@ -386,13 +386,10 @@ function inlineBareBlock(state: StateInline, silent: boolean): boolean {
 
     const endIndex = lines.slice(0, foundLine + 1).reduce((p, c) => p + c.length, 0) + foundLine + 1;
 
-    if (!silent) {
-        const token = state.push('math_inline_bare_block', 'math', 0);
-        token.block = true;
-        token.markup = "$$";
-        token.content = text.slice(1, endIndex)
-    }
-
+    const token = state.push('math_inline_bare_block', 'math', 0);
+    token.block = true;
+    token.markup = "$$";
+    token.content = text.slice(1, endIndex)
     state.pos = state.pos + endIndex;
     return true;
 }
@@ -461,21 +458,17 @@ function escapeHtml(unsafe: string): string {
 }
 
 
-export default function (md: import('markdown-it'), options: any) {
-    // Default options
-
-    options = options || {};
-
-    const enableBareBlocks = options.enableBareBlocks;
-    const enableMathBlockInHtml = options.enableMathBlockInHtml;
-    const enableMathInlineInHtml = options.enableMathInlineInHtml;
+export default function (md: import('markdown-it'), options?: MarkdownKatexOptions) {
+    const enableBareBlocks = options?.enableBareBlocks;
+    const enableMathBlockInHtml = options?.enableMathBlockInHtml;
+    const enableMathInlineInHtml = options?.enableMathInlineInHtml;
 
     const katexInline = (latex: string) => {
         const displayMode = /\\begin\{(align|equation|gather|cd|alignat)\}/ig.test(latex);
         try {
             return katex.renderToString(latex, { ...options, displayMode });
         } catch (error) {
-            if (options.throwOnError) {
+            if (options?.throwOnError) {
                 console.log(error);
             }
             return `<span class="katex-error" title="${escapeHtml(latex)}">${escapeHtml(error + '')}</span>`;
@@ -490,7 +483,7 @@ export default function (md: import('markdown-it'), options: any) {
         try {
             return `<p class="katex-block">${katex.renderToString(latex, { ...options, displayMode: true })}</p>`;
         } catch (error) {
-            if (options.throwOnError) {
+            if (options?.throwOnError) {
                 console.log(error);
             }
             return `<p class="katex-block katex-error" title="${escapeHtml(latex)}">${escapeHtml(error + '')}</p>`;

@@ -30,6 +30,9 @@ extends:
           - script: npm ci
             displayName: Install dependencies
 
+          - script: npm run compile
+            displayName: Compile
+
         testPlatforms:
           - name: Linux
             nodeVersions:
@@ -51,8 +54,13 @@ extends:
             displayName: Start xvfb
             condition: eq(variables['Agent.OS'], 'Linux')
 
+          - script: npm run compile
+            displayName: Compile npm package
+            env:
+              DISPLAY: ':99.0'
+
           - script: npm run test
-            displayName: Compile & test npm package
+            displayName: Test npm package
             env:
               DISPLAY: ':99.0'
 

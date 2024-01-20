@@ -3,12 +3,15 @@
         "module": "CommonJS",
         "target": "ES2022",
         "strict": true,
+        "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "rootDir": "src",
-        "outDir": "dist"
+        "outDir": "dist",
+        "sourceMap": true
     },
     "include": [
-        "src/**/*.ts"
+        "src/**/*.ts",
+        "types.d.ts"
     ],
     "exclude": [
         "node_modules",
