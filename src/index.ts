@@ -462,6 +462,7 @@ export default function (md: import('markdown-it'), options?: MarkdownKatexOptio
     const enableBareBlocks = options?.enableBareBlocks;
     const enableMathBlockInHtml = options?.enableMathBlockInHtml;
     const enableMathInlineInHtml = options?.enableMathInlineInHtml;
+    const enableFencedBlocks = options?.enableFencedBlocks;
 
     const katexInline = (latex: string) => {
         const displayMode = /\\begin\{(align|equation|gather|cd|alignat)\}/ig.test(latex);
@@ -494,6 +495,7 @@ export default function (md: import('markdown-it'), options?: MarkdownKatexOptio
         return katexBlockRenderer(tokens[idx].content) + '\n';
     }
 
+
     md.inline.ruler.after('escape', 'math_inline', inlineMath);
     md.inline.ruler.after('escape', 'math_inline_block', inlineMathBlock);
     if (enableBareBlocks) {
@@ -508,6 +510,16 @@ export default function (md: import('markdown-it'), options?: MarkdownKatexOptio
     }, {
         alt: ['paragraph', 'reference', 'blockquote', 'list']
     });
+
+    const originalFenceRenderer = md.renderer.rules.fence;
+    md.renderer.rules.fence = function (tokens: Token[], idx: number, options, env, self) {
+        const token = tokens[idx];
+        if (token.info.trim() === 'math' && enableFencedBlocks) {
+            return blockRenderer([token], 0);
+        } else {
+            return originalFenceRenderer?.call(this, tokens, idx, options, env, self) || '';
+        }
+    };
 
     // Regex to capture any html prior to math block, the math block (single or multi line), and any html after the math block
     const math_block_within_html_regex = /(?<html_before_math>[\s\S]*?)\$\$(?<math>[\s\S]+?)\$\$(?<html_after_math>(?:(?!\$\$[\s\S]+?\$\$)[\s\S])*)/gm;

@@ -17,6 +17,11 @@ export interface MarkdownKatexOptions {
     readonly enableMathInlineInHtml?: boolean;
 
     /**
+    Enable rendering of fenced math blocks.
+     */
+    readonly enableFencedBlocks?: boolean;
+
+    /**
      * Controls if an exception is thrown on katex errors.
      */
     readonly throwOnError?: boolean;
