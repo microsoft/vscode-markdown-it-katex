@@ -513,7 +513,12 @@ export default function (md: import('markdown-it'), options?: MarkdownKatexOptio
     };
 
     const inlineRenderer = (tokens: readonly Token[], idx: number) => {
-        return katexInline(tokens[idx].content);
+        const content = tokens[idx].content;
+        // To support expression like $`1+1 = 2`$, check if the the expression has leading and trailing "`".
+        const hasBacktick = content.length > 2 && content[0] === "`" && content[content.length - 1] === "`";
+        const sanitized = hasBacktick ? content.slice(1, -1) : content;
+
+        return katexInline(sanitized);
     };
 
     const katexBlockRenderer = (latex: string) => {
