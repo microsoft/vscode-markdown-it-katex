@@ -26,7 +26,7 @@ Use it in your javascript
 
 ```javascript
 var md = require('markdown-it')(),
-    mk = require('@vscode/markdown-it-katex');
+    mk = require('@vscode/markdown-it-katex').default;
 
 md.use(mk);
 

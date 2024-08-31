@@ -1,5 +1,5 @@
 const fs = require('fs');
-const mdk = require('../dist/index');
+const mdk = require('../dist/index').default;
 const md = require('markdown-it')()
     .use(mdk);
 

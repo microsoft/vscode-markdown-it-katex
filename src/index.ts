@@ -462,38 +462,9 @@ export default function (md: import('markdown-it'), options?: MarkdownKatexOptio
     const enableBareBlocks = options?.enableBareBlocks;
     const enableMathBlockInHtml = options?.enableMathBlockInHtml;
     const enableMathInlineInHtml = options?.enableMathInlineInHtml;
+    const enableFencedBlocks = options?.enableFencedBlocks;
 
-    const katexInline = (latex: string) => {
-        const displayMode = /\\begin\{(align|equation|gather|cd|alignat)\}/ig.test(latex);
-        try {
-            return katex.renderToString(latex, { ...options, displayMode });
-        } catch (error) {
-            if (options?.throwOnError) {
-                console.log(error);
-            }
-            return `<span class="katex-error" title="${escapeHtml(latex)}">${escapeHtml(error + '')}</span>`;
-        }
-    };
-
-    const inlineRenderer = (tokens: readonly Token[], idx: number) => {
-        return katexInline(tokens[idx].content);
-    };
-
-    const katexBlockRenderer = (latex: string) => {
-        try {
-            return `<p class="katex-block">${katex.renderToString(latex, { ...options, displayMode: true })}</p>`;
-        } catch (error) {
-            if (options?.throwOnError) {
-                console.log(error);
-            }
-            return `<p class="katex-block katex-error" title="${escapeHtml(latex)}">${escapeHtml(error + '')}</p>`;
-        }
-    }
-
-    const blockRenderer = (tokens: readonly Token[], idx: number) => {
-        return katexBlockRenderer(tokens[idx].content) + '\n';
-    }
-
+    // #region Parsing
     md.inline.ruler.after('escape', 'math_inline', inlineMath);
     md.inline.ruler.after('escape', 'math_inline_block', inlineMathBlock);
     if (enableBareBlocks) {
@@ -526,9 +497,58 @@ export default function (md: import('markdown-it'), options?: MarkdownKatexOptio
             return handleMathInHtml(state, "math_inline", "$", math_inline_within_html_regex);
         });
     }
+    // #endregion
+
+    // #region Rendering
+    const katexInline = (latex: string) => {
+        const displayMode = /\\begin\{(align|equation|gather|cd|alignat)\}/ig.test(latex);
+        try {
+            return katex.renderToString(latex, { ...options, displayMode });
+        } catch (error) {
+            if (options?.throwOnError) {
+                console.log(error);
+            }
+            return `<span class="katex-error" title="${escapeHtml(latex)}">${escapeHtml(error + '')}</span>`;
+        }
+    };
+
+    const inlineRenderer = (tokens: readonly Token[], idx: number) => {
+        return katexInline(tokens[idx].content);
+    };
+
+    const katexBlockRenderer = (latex: string) => {
+        try {
+            return `<p class="katex-block">${katex.renderToString(latex, { ...options, displayMode: true })}</p>`;
+        } catch (error) {
+            if (options?.throwOnError) {
+                console.log(error);
+            }
+            return `<p class="katex-block katex-error" title="${escapeHtml(latex)}">${escapeHtml(error + '')}</p>`;
+        }
+    }
+
+    const blockRenderer = (tokens: readonly Token[], idx: number) => {
+        return katexBlockRenderer(tokens[idx].content) + '\n';
+    }
 
     md.renderer.rules.math_inline = inlineRenderer;
     md.renderer.rules.math_inline_block = blockRenderer;
     md.renderer.rules.math_inline_bare_block = blockRenderer;
     md.renderer.rules.math_block = blockRenderer;
+
+    if (enableFencedBlocks) {
+        const mathLanguageId = 'math';
+
+        const originalFenceRenderer = md.renderer.rules.fence;
+        md.renderer.rules.fence = function (tokens: Token[], idx: number, options, env, self) {
+            const token = tokens[idx];
+            if (token.info.trim().toLowerCase() === mathLanguageId && enableFencedBlocks) {
+                return katexBlockRenderer(token.content) + '\n';
+            } else {
+                return originalFenceRenderer?.call(this, tokens, idx, options, env, self) || '';
+            }
+        };
+    }
+
+    // #endregion
 };
