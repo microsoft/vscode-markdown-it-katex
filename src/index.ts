@@ -143,9 +143,9 @@ function inlineMath(state: StateInline, silent: boolean): boolean {
 }
 
 function blockMath(state: StateBlock, start: number, end: number, silent: boolean): boolean {
-    var lastLine, next, lastPos, found = false, token,
-        pos = state.bMarks[start] + state.tShift[start],
-        max = state.eMarks[start]
+    let found = false;
+    let pos = state.bMarks[start] + state.tShift[start];
+    let max = state.eMarks[start];
 
     if (pos + 2 > max) {
         return false;
@@ -157,19 +157,28 @@ function blockMath(state: StateBlock, start: number, end: number, silent: boolea
     pos += 2;
     let firstLine = state.src.slice(pos, max);
 
+    // Check for single line expressions such as `$$x$$`
+    const endIndexes = [...firstLine.matchAll(/\$\$/g)];
+    if (endIndexes.length === 1 && endIndexes[0].index === firstLine.length - 2) {
+        // Fake inline expression such as `$$x$$`
+        // We actually want to treat this as a block instead of inline
+        firstLine = firstLine.trim().slice(0, -2);
+        found = true;
+    } else if (endIndexes.length > 1) {
+        // Multiple $$ in the first line, so this is not a block
+        // Should be treated as inline instead
+        return false;
+    }
+
     if (silent) {
         return true;
     }
-    if (firstLine.trim().slice(-2) === '$$') {
-        // Single line expression
-        firstLine = firstLine.trim().slice(0, -2);
-        found = true;
-    }
 
+    let lastLine: string | undefined;
+    let next: number;
+    let lastPos: number | undefined;
     for (next = start; !found;) {
-
         next++;
-
         if (next >= end) {
             break;
         }
@@ -196,7 +205,7 @@ function blockMath(state: StateBlock, start: number, end: number, silent: boolea
 
     state.line = next + 1;
 
-    token = state.push('math_block', 'math', 0);
+    const token = state.push('math_block', 'math', 0);
     token.block = true;
     token.content = (firstLine && firstLine.trim() ? firstLine + '\n' : '')
         + state.getLines(start + 1, next, state.tShift[start], true)
