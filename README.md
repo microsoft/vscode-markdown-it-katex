@@ -4,7 +4,7 @@ Markdown It plugin that adds [KaTeX](https://github.com/Khan/KaTeX) rendering. T
 
 Originally forked from [@iktakahiro/markdown-it-katex](https://github.com/iktakahiro/markdown-it-katex)
 
-## Usage 
+## Usage
 
 Install markdown-it
 
@@ -21,31 +21,37 @@ npm install @vscode/markdown-it-katex
 Use it in your javascript
 
 ```javascript
-var md = require('markdown-it')(),
-    mk = require('@vscode/markdown-it-katex').default;
+const md = require("markdown-it")();
+const mk = require("@vscode/markdown-it-katex").default;
 
 md.use(mk);
 
 // double backslash is required for javascript strings, but not html input
-var result = md.render('# Math Rulez! \n  $\\sqrt{3x-1}+(1+x)^2$');
+const result = md.render("# Math Rulez! \n  $\\sqrt{3x-1}+(1+x)^2$");
 ```
 
 Include the KaTeX stylesheet in your html:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
+/>
 ```
 
 If you're using the default markdown-it parser, I also recommend the [github stylesheet](https://github.com/sindresorhus/github-markdown-css):
 
 ```html
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css"/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css"
+/>
 ```
 
 `KaTeX` options can be supplied with the second argument to use.
 
 ```javascript
-md.use(mk, {"throwOnError" : false, "errorColor" : " #cc0000"});
+md.use(mk, { throwOnError: false, errorColor: " #cc0000" });
 ```
 
 ## Examples
@@ -76,19 +82,24 @@ $$\begin{array}{c}
 \end{array}$$
 ```
 
-### Katex extension
-```tsx
-import MarkdownIt from 'markdown-it'
-import katex from 'katex'
-import 'katex/contrib/mhchem'
-import 'katex/contrib/copy-tex'
-const md = new MarkdownIt()
-katexPlugin(md, {
-    katex,
-})
+### Using your own version of KaTeX
 
-const result = md.render('# Math Rulez! \n  $\\sqrt{3x-1}+(1+x)^2$');
-const chemResult = md.render('$\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}$')
+```js
+import MarkdownIt from "markdown-it";
+import mk from "@vscode/markdown-it-katex";
+import katex from "katex";
+
+// Load some katex extensions
+import "katex/contrib/mhchem";
+import "katex/contrib/copy-tex";
+
+const md = new MarkdownIt();
+md.use(mk.default, { katex });
+
+const result = md.render("# Math Rulez! \n  $\\sqrt{3x-1}+(1+x)^2$");
+const chemResult = md.render("$\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}$");
+console.log(result);
+console.log(chemResult);
 ```
 
 ## Syntax
