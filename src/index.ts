@@ -6,8 +6,15 @@ import type * as Token from 'markdown-it/lib/token';
 import { MarkdownKatexOptions } from '../types';
 
 /**
+ * Characters that never start a valid LaTeX math expression but commonly follow `$`
+ * in programming contexts (e.g., `$.getJSON`, `$(selector)`, `$#variable`).
+ */
+const programmingContextChars = new Set(['.', '(', '#', "'", '"', ',', ';']);
+
+/**
  * Test if potential opening or closing delimiter
  */
+
 function isValidInlineDelim(state: StateInline, pos: number): { can_open: boolean; can_close: boolean; } {
     const prevChar = state.src[pos - 1];
     const char = state.src[pos];
@@ -23,6 +30,13 @@ function isValidInlineDelim(state: StateInline, pos: number): { can_open: boolea
         prevChar === undefined || isWhitespace(prevChar) || !isWordCharacterOrNumber(prevChar)
     )) {
         canOpen = true;
+    }
+
+    // Reject opening delimiter when followed by a programming-context character.
+    // These characters never begin valid LaTeX math but are common in code like
+    // $.ajax, $(selector), $#var, etc. (see microsoft/vscode#268378)
+    if (canOpen && nextChar && programmingContextChars.has(nextChar)) {
+        canOpen = false;
     }
 
     if (nextChar !== '$' && (

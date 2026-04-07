@@ -190,12 +190,66 @@ Should not parse opening $ inside of inline html
 <p><code>$x</code> <code>${a}</code></p>
 .
 
-Error in block
+Dollar-dot should not be parsed as math (microsoft/vscode#268378)
 .
-$$
-\f
-$$
+$.getJSON and $.ajax
 .
-<p class="katex-block katex-error" title="\f
-">ParseError: KaTeX parse error: Undefined control sequence: \f at position 1: \̲f̲
-</p>.
+<p>$.getJSON and $.ajax</p>
+.
+
+Dollar-paren should not be parsed as math
+.
+$("#id").click()
+.
+<p>$(&quot;#id&quot;).click()</p>
+.
+
+Dollar-hash should not be parsed as math
+.
+$#variable is not math
+.
+<p>$#variable is not math</p>
+.
+
+Dollar-quote should not be parsed as math
+.
+$'string' is not math
+.
+<p>$'string' is not math</p>
+.
+
+Dollar-comma should not be parsed as math
+.
+a $, b $, c
+.
+<p>a $, b $, c</p>
+.
+
+Dollar-semicolon should not be parsed as math
+.
+a $; b
+.
+<p>a $; b</p>
+.
+
+Programming dollar in table should not be parsed as math
+.
+| Col1 | Col2 |
+|------|------|
+| $.get | fetch |
+.
+<table>
+<thead>
+<tr>
+<th>Col1</th>
+<th>Col2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$.get</td>
+<td>fetch</td>
+</tr>
+</tbody>
+</table>
+.
