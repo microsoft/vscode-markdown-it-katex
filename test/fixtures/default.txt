@@ -67,11 +67,25 @@ Inline math inside heading
 <h1>The <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span>-eigenvalue problem and two applications</h1>
 .
 
-Spaces around inline math block
+Inline math delimiters must hug their content, so `$ x $` is not math (#268378)
 .
 Euler's identity: $ e^{i \pi} + 1 = 0 $
 .
-<p>Euler's identity: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mrow><mi>i</mi><mi>π</mi></mrow></msup><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex"> e^{i \pi} + 1 = 0 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.907994em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.824664em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">iπ</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span></span></span></span></p>
+<p>Euler's identity: $ e^{i \pi} + 1 = 0 $</p>
+.
+
+A dollar sign followed by whitespace does not open math (#268378)
+.
+$("#dialogDetalleZona").dialog(...) / $("#dialogDetallePDC").dialog(...)
+.
+<p>$(&quot;#dialogDetalleZona&quot;).dialog(...) / $(&quot;#dialogDetallePDC&quot;).dialog(...)</p>
+.
+
+A dollar sign preceded by whitespace does not close math (#268378)
+.
+Reset with $.getJSON, $.ajax, $.get calls
+.
+<p>Reset with $.getJSON, $.ajax, $.get calls</p>
 .
 
 Inline math block

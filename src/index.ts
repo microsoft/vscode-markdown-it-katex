@@ -19,15 +19,21 @@ function isValidInlineDelim(state: StateInline, pos: number): { can_open: boolea
 
     let canOpen = false;
     let canClose = false;
+    // An opening `$` must sit on a word boundary and be immediately followed by
+    // non-whitespace. The trailing check keeps code-like prose such as `$.get`
+    // or `$("#id")` from opening math on a stray dollar sign.
     if (prevChar !== '$' && prevChar !== '\\' && (
         prevChar === undefined || isWhitespace(prevChar) || !isWordCharacterOrNumber(prevChar)
-    )) {
+    ) && nextChar !== undefined && !isWhitespace(nextChar)) {
         canOpen = true;
     }
 
+    // A closing `$` must sit on a word boundary and be immediately preceded by
+    // non-whitespace, so a later dollar sign in prose can't close math opened
+    // far earlier and swallow everything in between.
     if (nextChar !== '$' && (
-        nextChar == undefined || isWhitespace(nextChar) || !isWordCharacterOrNumber(nextChar))
-    ) {
+        nextChar == undefined || isWhitespace(nextChar) || !isWordCharacterOrNumber(nextChar)
+    ) && prevChar !== undefined && !isWhitespace(prevChar)) {
         canClose = true;
     }
 
