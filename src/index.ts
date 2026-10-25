@@ -159,13 +159,13 @@ function blockMath(state: StateBlock, start: number, end: number, silent: boolea
 
     // Check for single line expressions such as `$$x$$`
     const endIndexes = [...firstLine.matchAll(/\$\$/g)];
-    if (endIndexes.length === 1 && endIndexes[0].index === firstLine.length - 2) {
+    if (endIndexes.length === 1 && endIndexes[0].index === firstLine.trimEnd().length - 2) {
         // Fake inline expression such as `$$x$$`
         // We actually want to treat this as a block instead of inline
         firstLine = firstLine.trim().slice(0, -2);
         found = true;
-    } else if (endIndexes.length > 1) {
-        // Multiple $$ in the first line, so this is not a block
+    } else if (endIndexes.length >= 1) {
+        // Multiple $$ in the first line, or text after the closing $$, so this is not a block
         // Should be treated as inline instead
         return false;
     }
