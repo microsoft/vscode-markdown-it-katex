@@ -487,7 +487,7 @@ export default function (md: import('markdown-it'), options?: MarkdownKatexOptio
         }
         return blockMath(state, start, end, silent);
     }, {
-        alt: ['paragraph', 'reference', 'blockquote', 'list']
+        alt: ['reference', 'blockquote', 'list']
     });
 
     // Regex to capture any html prior to math block, the math block (single or multi line), and any html after the math block

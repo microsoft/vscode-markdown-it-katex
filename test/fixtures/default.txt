@@ -190,6 +190,20 @@ Should not parse opening $ inside of inline html
 <p><code>$x</code> <code>${a}</code></p>
 .
 
+Should not break list continuation after a display equation that follows single line break
+.
+1. A
+$$math$$
+2. B
+.
+<ol>
+<li>A
+<p class="katex-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>m</mi><mi>a</mi><mi>t</mi><mi>h</mi></mrow><annotation encoding="application/x-tex">math</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style=""></span><span class="mord mathnormal">ma</span><span class="mord mathnormal">t</span><span class="mord mathnormal">h</span></span></span></span></span></p>
+</li>
+<li>B</li>
+</ol>
+.
+
 Error in block
 .
 $$
