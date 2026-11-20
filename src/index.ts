@@ -6,6 +6,16 @@ import type * as Token from 'markdown-it/lib/token';
 import { MarkdownKatexOptions } from '../types';
 
 /**
+ * Characters that never begin a LaTeX math expression but commonly follow `$`
+ * in programming contexts (e.g. `$.getJSON`, `$#var`, `$'string'`).
+ *
+ * `(` is handled separately below: `$(x)$` is valid LaTeX, while
+ * `$("#id")` / `$('sel')` / `$(#id)` are jQuery-style selectors
+ * (see microsoft/vscode#268378).
+ */
+const programmingContextChars = new Set(['.', '#', "'", '"', ',', ';']);
+
+/**
  * Test if potential opening or closing delimiter
  */
 function isValidInlineDelim(state: StateInline, pos: number): { can_open: boolean; can_close: boolean; } {
@@ -23,6 +33,18 @@ function isValidInlineDelim(state: StateInline, pos: number): { can_open: boolea
         prevChar === undefined || isWhitespace(prevChar) || !isWordCharacterOrNumber(prevChar)
     )) {
         canOpen = true;
+    }
+
+    // Reject opening `$` used as a programming sigil rather than math.
+    if (canOpen && nextChar && programmingContextChars.has(nextChar)) {
+        canOpen = false;
+    }
+    // `$("#id")` / `$('sel')` / `$(#x)` — not `$(x)` math grouping.
+    if (canOpen && nextChar === '(') {
+        const afterParen = state.src[pos + 2];
+        if (afterParen === '"' || afterParen === "'" || afterParen === '#') {
+            canOpen = false;
+        }
     }
 
     if (nextChar !== '$' && (
