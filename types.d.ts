@@ -28,6 +28,8 @@ export interface MarkdownKatexOptions {
      */
     readonly enableFencedBlocks?: boolean;
 
+    readonly enableLatexInlineDelimiters?: boolean;
+
     /**
      * Controls if an exception is thrown on katex errors.
      */

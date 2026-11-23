@@ -64,6 +64,8 @@ Surround your LaTeX with a single `$` on each side for inline rendering.
 $\sqrt{3x-1}+(1+x)^2$
 ```
 
+Set `enableLatexInlineDelimiters: true` in the plugin options to also render inline equations between `\(` and `\)`.
+
 ### Block
 
 Use two (`$$`) for block rendering. This mode uses bigger symbols and centers
