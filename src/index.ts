@@ -142,6 +142,40 @@ function inlineMath(state: StateInline, silent: boolean): boolean {
     return true;
 }
 
+function latexInlineMath(state: StateInline, silent: boolean): boolean {
+    const { src, pos, posMax } = state;
+    if (!src.startsWith('\\(', pos)) {
+        return false;
+    }
+
+    const start = pos + 2;
+    let end = start;
+    while ((end = src.indexOf('\\', end)) !== -1 && end + 1 < posMax) {
+        const nextChar = src[end + 1];
+        if (nextChar === '(') {
+            return false;
+        }
+
+        if (nextChar === ')') {
+            const content = src.slice(start, end);
+            if (!content.trim()) {
+                return false;
+            }
+            if (!silent) {
+                const token = state.push('math_inline', 'math', 0);
+                token.markup = '\\(';
+                token.content = content;
+            }
+            state.pos = end + 2;
+            return true;
+        }
+
+        end += 2;
+    }
+
+    return false;
+}
+
 function blockMath(state: StateBlock, start: number, end: number, silent: boolean): boolean {
     let found = false;
     let pos = state.bMarks[start] + state.tShift[start];
@@ -475,6 +509,9 @@ export default function (md: import('markdown-it'), options?: MarkdownKatexOptio
     const enableFencedBlocks = options?.enableFencedBlocks;
 
     // #region Parsing
+    if (options?.enableLatexInlineDelimiters) {
+        md.inline.ruler.before('escape', 'math_inline_latex', latexInlineMath);
+    }
     md.inline.ruler.after('escape', 'math_inline', inlineMath);
     md.inline.ruler.after('escape', 'math_inline_block', inlineMathBlock);
     if (enableBareBlocks) {
@@ -523,9 +560,9 @@ export default function (md: import('markdown-it'), options?: MarkdownKatexOptio
     };
 
     const inlineRenderer = (tokens: readonly Token[], idx: number) => {
-        const content = tokens[idx].content;
+        const { content, markup } = tokens[idx];
         // To support expression like $`1+1 = 2`$, check if the the expression has leading and trailing "`".
-        const hasBacktick = content.length > 2 && content[0] === "`" && content[content.length - 1] === "`";
+        const hasBacktick = markup !== '\\(' && content.length > 2 && content[0] === "`" && content[content.length - 1] === "`";
         const sanitized = hasBacktick ? content.slice(1, -1) : content;
 
         return katexInline(sanitized);
